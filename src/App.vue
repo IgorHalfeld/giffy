@@ -1,28 +1,182 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <section class="container" id="app">
+    <h1 class="app-title">Gi<span>ff</span>y</h1>
+    <Header
+      @type="(v) => search(v)"
+      @search="search"
+      @limit="(v) => limit = v"
+    />
+    <Article :gifs="gifs" />
+  </section>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Header from './components/Header'
+import Article from './components/Article'
+import { APICall } from './utils'
 
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
+  name: 'App',
+  components: { Header, Article },
+  data: () => ({
+    gifs: [],
+    q: '',
+    limit: 5
+  }),
+  async mounted () {
+    this.gifs = await APICall('/trending', { limit: this.limit })
+  },
+  methods: { 
+    async search (q = this.q) {
+      this.gifs = await APICall('/search', { limit: this.limit, q })
+    }
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  font-family: sans-serif;
+}
+
+/* layouts rules */
+.container {
+  width: 100%;
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.container .container-header {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@media all and (max-width: 680px) {
+  .container .container-header { margin-top: 10px; height: auto; }
+}
+
+.container .container-article {
+  width: 60%;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  justify-content: space-between;
+}
+@media all and (max-width: 680px) {
+  .container .container-article { width: 90%; }
+}
+@media all and (max-width: 450px) {
+  .container .container-article { justify-content: center; }
+}
+
+/* components rules */
+.app-title {
+  position: relative;
+  color: #6195FF;
+  font-size: 3rem;
+  font-weight: 400;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  text-transform: uppercase;
+}
+.app-title::after {
+  position: absolute;
+  content: "with Vue.js :)";
+  background-color: #6195FF;
+  border-radius: 4px;
+  color: #fff;
+  font-size: .9rem;
+  text-transform: none;
+  padding: 5px;
+  top: 40px;
+  right: -36px;
+  transform: rotate(-10deg)
+}
+.app-title > span { font-weight: 800; }
+@media all and (max-width: 680px) {
+  .app-title { font-size: 2rem; }
+}
+
+/*
+.searchbar {
+  border: 1px solid purple;
+}
+*/
+@media all and (max-width: 680px) {
+  .searchbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.searchbar .searchbar--input {
+  padding: 15px 30px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1.1rem;
+  color: #444;
+}
+.searchbar .searchbar--limit {
+  background-color: #fff;
+  border: none;
+  border-radius: 4px;
+  color: #444;
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 80px;
+  height: 50px;
+  margin-left: 50px;
+}
+@media all and (max-width: 680px) {
+  .searchbar .searchbar--limit { margin-left: 0px; }
+}
+
+.searchbar .searchbar--button {
+  height: 50px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: .1s ease-in all;
+  background-color: #6195FF;
+  border: 1px solid #ccc;
+  color: #fff;
+}
+.searchbar .searchbar--button:hover {
+  background-color: rgb(58, 120, 243);
+}
+@media all and (max-width: 680px) {
+  .searchbar .searchbar--button { margin-top: 10px; margin-bottom: 10px; }
+}
+
+
+/* helpers */
+.gif {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0px 0px 30px #aaa;
+  transition: all .2s ease-in;
+}
+
+.gif:hover {
+  box-shadow: 0px 0px 10px #aaa;
+  transform: scale(1.1, 1.1);
 }
 </style>
+
